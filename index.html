@@ -311,16 +311,8 @@
         <div class="header-details">
             <div class="header-info">
                 <label for="cashier-name">ชื่อแคชเชียร์:</label>
-                <input type="text" id="cashier-name" name="cashier-name" placeholder="กรอกชื่อ" oninput="updateSignatures()">
+                <input type="text" id="cashier-name" name="cashier-name" placeholder="กรอกชื่อแคชเชียร์" oninput="updateSignatures()">
             </div>
-            <div class="header-info">
-                <label for="branch-select">สาขา:</label>
-                <select id="branch-select" name="branch-select" class="date-field" style="width: 150px !important;">
-                    <option value="พรุเตียว">พรุเตียว</option>
-                    <option value="กอตง">กอตง</option>
-                </select>
-            </div>
-
             <div class="header-info">
                 <input type="text" id="current-date" class="date-field" readonly>
             </div>
@@ -676,20 +668,13 @@
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr0DnrTFR0OsRZkg61TB1SVO1J-_KxE4cusYYbVnWMiNwgrUgP1rvU2Sp2h-PVUcXi/exec"; 
             const submitBtn = document.getElementById('submit-btn');
             const statusMsg = document.getElementById('status-message');
-
-            const cashierName = document.getElementById('cashier-name').value.trim();
-            if (!cashierName) {
-                alert('กรุณากรอกชื่อแคชเชียร์');
-                return;
-            }
-
             submitBtn.disabled = true;
             statusMsg.textContent = 'กำลังบันทึก...';
             statusMsg.className = 'status-message';
             const data = [];
             data.push(new Date()); 
             data.push(document.getElementById('current-date').value);
-            data.push(`${cashierName} [${document.getElementById('branch-select').value}]`);
+            data.push(document.getElementById('cashier-name').value);
             data.push(document.getElementById('summary-capital').value);
             data.push(document.getElementById('summary-expenses').value);
             data.push(document.getElementById('summary-intraday').value);
@@ -749,29 +734,21 @@
             data.push(JSON.stringify(intraday));
             fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
+                mode: 'no-cors',
                 cache: 'no-cache',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'saveData', data: data }),
+                body: JSON.stringify(data),
                 redirect: 'follow'
             })
             .then(response => {
-                if (response.headers.get("content-type")?.includes("application/json")) {
-                    return response.json();
-                }
-                // สำหรับ response ที่มาจาก no-cors หรือ redirect ที่ไม่คืน JSON
-                return { status: 'success_unknown_response' };
-            })
-            .then(result => {
                 statusMsg.textContent = "บันทึกข้อมูลสำเร็จ!";
                 statusMsg.className = 'status-message success';
+                submitBtn.disabled = false;
                 resetForm(); // <-- เรียกใช้ฟังก์ชันล้างฟอร์มตรงนี้
             })
             .catch(error => {
                 statusMsg.textContent = "เกิดข้อผิดพลาด: " + error.message;
                 statusMsg.className = 'status-message error';
-            })
-            .finally(() => {
                 submitBtn.disabled = false;
             });
         }
