@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เช็คเงินแคชเชียร์ประจำวัน</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+        
+        :root {
+            --primary-green: #005A31; 
+            --button-green: #28a745; 
+            --button-hover-green: #218838;
+            --danger-red: #dc3545;
+            --danger-hover-red: #c82333;
+            --total-orange-bg: #FFF4E3; 
+            --total-green-bg: #E8F5E9;
+            --verified-color: #155724; 
+            --unverified-color: #0056b3; 
+            --border-color: #DEE2E6; 
+            --header-bg: #F8F9FA;
+            --body-bg: #F4F7F6;
+        }
+
+        .form-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Tahoma', sans-serif';
+            font-size: 14px;
+            margin: 20px;
+            background-color: var(--body-bg);
+            color: #333;
+        }
+        .container {
+            width: 850px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .main-header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .main-header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+        .header-details {
+            text-align: right;
+        }
+        .header-info {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 5px;
+        }
+        .header-info label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .header-info input {
+            border: none;
+            border-bottom: 1px dotted #000;
+            padding: 5px;
+            width: 150px;
+        }
+        .header-info input:focus {
+            outline: none;
+        }
+        .date-field {
+            background-color: #E6F7FF;
+            border: 1px solid #91D5FF !important;
+            border-radius: 4px;
+            padding: 5px 10px !important;
+            font-weight: bold;
+            text-align: center;
+            width: 120px !important;
+        }
+        .instructions {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 5px 0 0 0;
+            color: #555;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--primary-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        thead th {
+            background-color: var(--header-bg);
+            font-weight: bold;
+            padding: 10px;
+            font-size: 15px;
+        }
+        td input[type="number"], td input[type="text"], td input[type="time"] {
+            width: 98%;
+            border: none;
+            text-align: right;
+            background-color: transparent;
+            font-size: 14px;
+            font-family: 'Sarabun', 'Tahoma', sans-serif';
+        }
+        td input:focus {
+            outline: none;
+        }
+        .total-row td {
+            font-weight: bold;
+            background-color: var(--total-orange-bg);
+            font-size: 15px;
+        }
+        .subtotal-row {
+            background-color: #f7f7f7;
+        }
+        .subtotal-row input {
+            font-weight: bold;
+            color: var(--unverified-color);
+        }
+        .subtotal-row input.verified {
+            color: var(--verified-color);
+        }
+        .total-row-green td {
+            font-weight: bold;
+            background-color: var(--total-green-bg);
+        }
+        .text-left {
+            text-align: left !important;
+            padding-left: 10px;
+            font-weight: normal;
+        }
+        .text-left-header {
+             text-align: left !important;
+            padding-left: 10px;
+            font-weight: bold;
+        }
+        .text-center {
+            text-align: center !important;
+        }
+        .summary-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #F8F9FA;
+            border-radius: 6px;
+        }
+        .summary-column {
+            width: 50%;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .summary-row label {
+            flex-basis: 40%;
+            text-align: left;
+            font-weight: bold;
+        }
+        .summary-row input {
+            flex-basis: 50%;
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: right;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .summary-row span {
+            flex-basis: 10%;
+            text-align: right;
+        }
+        .summary-row input.orange-bg {
+             background-color: var(--total-orange-bg);
+             border-color: #e6d8c3;
+        }
+        .summary-row input.green-bg {
+             background-color: var(--total-green-bg);
+             border-color: #c8e0ca;
+        }
+        .submit-button-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .submit-button {
+            background-color: var(--button-green);
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Sarabun', 'Tahoma', sans-serif';
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+        }
+        .submit-button:hover {
+            background-color: var(--button-hover-green);
+            transform: translateY(-1px);
+        }
+        .submit-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #status-message {
+            font-weight: bold;
+            font-size: 15px;
+        }
+        #status-message.success {
+            color: var(--verified-color);
+        }
+        #status-message.error {
+            color: #CC0000;
+        }
+        .add-row-btn {
+            background-color: #fff;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .add-row-btn:hover {
+            background-color: var(--primary-green);
+            color: #fff;
+        }
+        .delete-row-btn {
+            background-color: var(--danger-red);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 28px;
+            transition: background-color 0.2s;
+        }
+        .delete-row-btn:hover {
+            background-color: var(--danger-hover-red);
+        }
+        .notes-row {
+            background-color: #fef9e7;
+        }
+        .notes-field {
+            width: 95% !important;
+            border: 1px solid #ccc !important;
+            border-radius: 3px;
+            text-align: left !important;
+            padding: 2px 4px !important;
+        }
+        .notes-cell {
+            visibility: hidden;
+        }
+        .notes-cell.visible {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+    <div class="main-header">
+        <div>
+            <h1>เช็คเงินแคชเชียร์ประจำวัน</h1>
+            <ul class="instructions">
+                <li>- รับเงินเข้าตอนเช้า</li>
+                <li>- นับเงินออก ตอนเย็น</li>
+                <li>- ส่งมอบเงินระหว่างวัน/แลกเงินทอน</li>
+            </ul>
+        </div>
+        <div class="header-details">
+            <div class="header-info">
+                <label for="cashier-name">ชื่อแคชเชียร์:</label>
+                <input type="text" id="cashier-name" name="cashier-name" placeholder="กรอกชื่อแคชเชียร์" oninput="updateSignatures()">
+            </div>
+            <div class="header-info">
+                <input type="text" id="current-date" class="date-field" readonly>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-form-content"> <!-- START: Content to be disabled -->
+        <div class="section-title">บันทึกเงินทอน ขาเข้า</div>
+    <table id="change-out-table">
+        <thead>
+            <tr>
+                <th>1,000</th><th>500</th><th>100</th><th>50</th><th>20</th><th>10</th><th>5</th><th>1</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" min="0" value="0" data-value="1000" oninput="calculateTotal('change-out')"></td>
+                <td><input type="number" min="0" value="0" data-value="500" oninput="calculateTotal('change-out')"></td>
+                <td><input type="number" min="0" value="0" data-value="100" oninput="calculateTotal('change-out')"></td>
+                <td><input type="number" min="0" value="0" data-value="50" oninput="calculateTotal('change-out')"></td>
+                <td><input type="number" min="0" value="0" data-value="20" oninput="calculateTotal('change-out')"></td>
+                <td><input type="number" min="0" value="0" data-value="10" oninput="calculateTotal('change-out')"></td>
+                <td><input type="number" min="0" value="0" data-value="5" oninput="calculateTotal('change-out')"></td>
+                <td><input type="number" min="0" value="0" data-value="1" oninput="calculateTotal('change-out')"></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+            </tr>
+            <tr class="subtotal-row">
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+            </tr>
+            <tr class="notes-row">
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="6" class="text-left-header">ยอดรวมเงิน</td>
+                <td colspan="2"><input type="text" id="change-out-total" class="total-field" value="0.00" readonly></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="section-title">
+        <span>หัก ค่าใช้จ่ายประจำวัน</span>
+        <button type="button" class="add-row-btn" onclick="addExpenseRow()">+ เพิ่มรายการ</button>
+    </div>
+    <table id="expenses-table">
+        <thead>
+            <tr>
+                <th style="width: 16%;">รายการ</th>
+                <th style="width: 16%;">จำนวนเงิน</th>
+                <th style="width: 16%;">รายการ</th>
+                <th style="width: 16%;">จำนวนเงิน</th>
+                <th style="width: 16%;">รายการเบิกเงิน</th>
+                <th style="width: 16%;">จำนวนเงิน</th>
+                <th style="width: 4%;"></th>
+            </tr>
+        </thead>
+        <tbody id="expense-body">
+             <tr>
+                <td><input type="text" class="text-left expense-desc"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><input type="text" class="text-left expense-desc"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><input type="text" class="text-left expense-desc"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><button type="button" class="delete-row-btn" onclick="deleteRow(this, 'expenses')">&times;</button></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="6" class="text-left-header">รวมค่าใช้จ่าย</td>
+                <td><input type="text" id="expenses-total" class="total-field" value="0.00" readonly></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div class="section-title">บันทึกเงินทอน ขาออก</div>
+    <table id="change-in-table">
+        <thead>
+            <tr>
+                <th>1,000</th><th>500</th><th>100</th><th>50</th><th>20</th><th>10</th><th>5</th><th>1</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" min="0" value="0" data-value="1000" oninput="calculateTotal('change-in')"></td>
+                <td><input type="number" min="0" value="0" data-value="500" oninput="calculateTotal('change-in')"></td>
+                <td><input type="number" min="0" value="0" data-value="100" oninput="calculateTotal('change-in')"></td>
+                <td><input type="number" min="0" value="0" data-value="50" oninput="calculateTotal('change-in')"></td>
+                <td><input type="number" min="0" value="0" data-value="20" oninput="calculateTotal('change-in')"></td>
+                <td><input type="number" min="0" value="0" data-value="10" oninput="calculateTotal('change-in')"></td>
+                <td><input type="number" min="0" value="0" data-value="5" oninput="calculateTotal('change-in')"></td>
+                <td><input type="number" min="0" value="0" data-value="1" oninput="calculateTotal('change-in')"></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+            </tr>
+            <tr class="subtotal-row">
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+                <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
+            </tr>
+            <tr class="notes-row">
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+                <td class="notes-cell"><input type="text" class="notes-field" placeholder="หมายเหตุ..."></td>
+            </tr>
+            <tr>
+                <td colspan="6" class="text-left-header">เงินเกิน</td>
+                <td colspan="2"><input type="number" id="change-in-over" class="total-field" min="0" value="0" oninput="calculateTotal('change-in')"></td>
+            </tr>
+            <tr>
+                <td colspan="6" class="text-left-header">เงินขาด</td>
+                <td colspan="2"><input type="number" id="change-in-short" class="total-field" min="0" value="0" oninput="calculateTotal('change-in')"></td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="6" class="text-left-header">ส่งยอด</td>
+                <td colspan="2"><input type="text" id="change-in-total" class="total-field" value="0.00" readonly></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="section-title">ส่งเงินระหว่างวัน</div>
+    <table id="intraday-table">
+        <thead>
+            <tr>
+                <th>เวลาส่งเงิน</th><th>จำนวนเงินที่ส่ง</th><th>ลายเซ็นผู้ส่งเงิน</th><th>ลายเซ็นผู้รับเงิน</th><th>หมายเหตุ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width:15%;"><input type="time" class="intraday-time"></td>
+                <td style="width:20%;"><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)"></td>
+                <td style="width:20%;"><input type="text" class="sender-signature text-center" readonly></td>
+                <td style="width:20%;"></td>
+                <td style="width:25%;"><input type="text" class="text-left intraday-notes"></td>
+            </tr>
+            <tr>
+                <td style="width:15%;"><input type="time" class="intraday-time"></td>
+                <td style="width:20%;"><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)"></td>
+                <td style="width:20%;"><input type="text" class="sender-signature text-center" readonly></td>
+                <td style="width:20%;"></td>
+                <td style="width:25%;"><input type="text" class="text-left intraday-notes"></td>
+            </tr>
+            <tr>
+                <td style="width:15%;"><input type="time" class="intraday-time"></td>
+                <td style="width:20%;"><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)"></td>
+                <td style="width:20%;"><input type="text" class="sender-signature text-center" readonly></td>
+                <td style="width:20%;"></td>
+                <td style="width:25%;"><input type="text" class="text-left intraday-notes"></td>
+            </tr>
+            <tr class="total-row">
+                <td class="text-left-header">รวมส่งเงิน</td>
+                <td><input type="text" id="intraday-total" class="total-field" value="0.00" readonly></td>
+                <td colspan="3"></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="summary-section">
+        <div class="summary-column">
+            <div class="summary-row">
+                <label>ทุน</label>
+                <input type="text" id="summary-capital" class="orange-bg" readonly>
+                <span>บาท</span>
+            </div>
+            <div class="summary-row">
+                <label>ขาย เงินสด</label>
+                <input type="number" id="summary-cash-sales" value="0" oninput="updateFinalSummary()">
+                <span>บาท</span>
+            </div>
+            <div class="summary-row">
+                <label>รวม</label>
+                <input type="text" id="summary-total-revenue" class="orange-bg" readonly>
+                <span>บาท</span>
+            </div>
+             <div class="summary-row">
+                <label>หัก ค่าใช้จ่าย</label>
+                <input type="text" id="summary-expenses" class="orange-bg" readonly>
+                <span>บาท</span>
+            </div>
+            <div class="summary-row">
+                <label>หัก ส่งเงิน</label>
+                <input type="text" id="summary-intraday" class="orange-bg" readonly>
+                <span>บาท</span>
+            </div>
+            <div class="summary-row">
+                <label>คงเหลือ</label>
+                <input type="text" id="summary-balance" class="orange-bg" readonly>
+                <span>บาท</span>
+            </div>
+        </div>
+        <div class="summary-column">
+             <div class="summary-row">
+                <label>ขาย เงินสด</label>
+                <input type="text" id="summary-cash-sales-display" readonly>
+                <span>บาท</span>
+            </div>
+            <div class="summary-row">
+                <label>ขาย เงินโอน</label>
+                <input type="number" id="summary-transfer-sales" value="0" oninput="updateFinalSummary()">
+                <span>บาท</span>
+            </div>
+            <div class="summary-row">
+                <label>ขาย เงินเชื่อ</label>
+                <input type="number" id="summary-credit-sales" value="0" oninput="updateFinalSummary()">
+                <span>บาท</span>
+            </div>
+             <div class="summary-row" style="visibility: hidden;"><label>&nbsp;</label><input><label>&nbsp;</label></div>
+             <div class="summary-row" style="visibility: hidden;"><label>&nbsp;</label><input><label>&nbsp;</label></div>
+            <div class="summary-row">
+                <label>รวม</label>
+                <input type="text" id="summary-total-sales" class="green-bg" readonly>
+                <span>บาท</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="submit-button-container">
+        <div id="status-message"></div>
+        <button id="submit-btn" class="submit-button" onclick="handleFormSubmit()">ส่งรายงาน</button>
+    </div>
+    </div> <!-- END: Content to be disabled -->
+
+</div>
+
+    <script>
+        function handleIntradayInput(inputElement) {
+            const row = inputElement.closest('tr');
+            const timeInput = row.querySelector('.intraday-time');
+            const amount = parseFloat(inputElement.value) || 0;
+
+            if (amount > 0 && !timeInput.value) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                timeInput.value = `${hours}:${minutes}`;
+            } else if (amount === 0) {
+                timeInput.value = '';
+            }
+
+            calculateTotal('intraday');
+        }
+
+        // ***** ฟังก์ชันใหม่สำหรับล้างฟอร์ม *****
+        function resetForm() {
+            // ล้างชื่อแคชเชียร์
+            document.getElementById('cashier-name').value = '';
+
+            // ล้างตารางเงินทอน (ขาออก และ ขาเข้า)
+            ['change-out-table', 'change-in-table'].forEach(tableId => {
+                const table = document.getElementById(tableId);
+                table.querySelectorAll('input[type="number"]').forEach(input => input.value = '0');
+                table.querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = false);
+                table.querySelectorAll('.notes-field').forEach(input => input.value = '');
+            });
+
+            // ล้างตารางค่าใช้จ่ายให้เหลือ 1 แถว
+            const expenseBody = document.getElementById('expense-body');
+            while (expenseBody.rows.length > 1) {
+                expenseBody.deleteRow(0);
+            }
+            expenseBody.querySelectorAll('input').forEach(input => input.value = (input.type === 'number') ? '0' : '');
+
+            // ล้างตารางส่งเงินระหว่างวัน
+            document.querySelectorAll('#intraday-table input').forEach(input => {
+                 if(input.type === 'number') input.value = '0';
+                 else if (input.type !== 'text' || !input.classList.contains('sender-signature')) input.value = '';
+            });
+
+            // ล้างยอดขาย
+            document.getElementById('summary-cash-sales').value = '0';
+            document.getElementById('summary-transfer-sales').value = '0';
+            document.getElementById('summary-credit-sales').value = '0';
+            document.getElementById('change-in-over').value = '0';
+            document.getElementById('change-in-short').value = '0';
+
+            // คำนวณทุกอย่างใหม่เพื่อให้แสดงผลเป็น 0
+            ['change-out', 'expenses', 'change-in', 'intraday'].forEach(calculateTotal);
+
+            // เลื่อนหน้าจอไปด้านบนสุด
+            window.scrollTo(0, 0);
+            document.getElementById('cashier-name').focus();
+        }
+
+
+        // ----- โค้ดส่วนที่เหลือเหมือนเดิมทั้งหมด -----
+        
+        function addExpenseRow() {
+            const tbody = document.getElementById('expense-body');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" class="text-left expense-desc"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><input type="text" class="text-left expense-desc"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><input type="text" class="text-left expense-desc"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><button type="button" class="delete-row-btn" onclick="deleteRow(this, 'expenses')">&times;</button></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function deleteRow(button, section) {
+            const tbody = button.closest('tbody');
+            if (tbody.rows.length > 1) {
+                button.closest('tr').remove();
+                calculateTotal(section);
+            } else {
+                alert('ไม่สามารถลบแถวสุดท้ายได้');
+            }
+        }
+
+        function handleFormSubmit() {
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr0DnrTFR0OsRZkg61TB1SVO1J-_KxE4cusYYbVnWMiNwgrUgP1rvU2Sp2h-PVUcXi/exec"; 
+            const submitBtn = document.getElementById('submit-btn');
+            const statusMsg = document.getElementById('status-message');
+            submitBtn.disabled = true;
+            statusMsg.textContent = 'กำลังบันทึก...';
+            statusMsg.className = 'status-message';
+            const data = [];
+            data.push(new Date()); 
+            data.push(document.getElementById('current-date').value);
+            data.push(document.getElementById('cashier-name').value);
+            data.push(document.getElementById('summary-capital').value);
+            data.push(document.getElementById('summary-expenses').value);
+            data.push(document.getElementById('summary-intraday').value);
+            data.push(document.getElementById('change-in-total').value);
+            data.push(document.getElementById('summary-cash-sales').value);
+            data.push(document.getElementById('summary-transfer-sales').value);
+            data.push(document.getElementById('summary-credit-sales').value);
+            data.push(document.getElementById('summary-total-sales').value);
+            data.push(document.getElementById('summary-total-revenue').value);
+            data.push(document.getElementById('summary-balance').value);
+            const changeOutTable = document.getElementById('change-out-table');
+            const outCounts = changeOutTable.querySelectorAll('tbody tr:nth-child(1) input');
+            const outChecks = changeOutTable.querySelectorAll('tbody tr:nth-child(2) input');
+            const outSubtotals = changeOutTable.querySelectorAll('tbody tr:nth-child(3) input');
+            const outNotes = changeOutTable.querySelectorAll('tbody tr:nth-child(4) .notes-field');
+            for(let i=0; i<outCounts.length; i++) {
+                data.push(outCounts[i].value);
+                data.push(outSubtotals[i].value);
+                data.push(outChecks[i].checked);
+                data.push(outNotes[i].value);
+            }
+            data.push(0); // ออก: เงินเกิน (ยังไม่มีฟิลด์)
+            data.push(0); // ออก: เงินขาด (ยังไม่มีฟิลด์)
+            const expenses = [];
+            const expenseRows = document.querySelectorAll('#expenses-table #expense-body tr');
+            for (let i = 0; i < expenseRows.length; i++) {
+                const descs = expenseRows[i].querySelectorAll('.expense-desc');
+                const amounts = expenseRows[i].querySelectorAll('.expense-item');
+                if(descs[0].value && amounts[0].value !== '0') expenses.push({ item: descs[0].value, amount: amounts[0].value });
+                if(descs[1].value && amounts[1].value !== '0') expenses.push({ item: descs[1].value, amount: amounts[1].value });
+                if(descs[2].value && amounts[2].value !== '0') expenses.push({ item: descs[2].value, amount: amounts[2].value });
+            }
+            data.push(JSON.stringify(expenses));
+            const changeInTable = document.getElementById('change-in-table');
+            const inCounts = changeInTable.querySelectorAll('tbody tr:nth-child(1) input');
+            const inChecks = changeInTable.querySelectorAll('tbody tr:nth-child(2) input');
+            const inSubtotals = changeInTable.querySelectorAll('tbody tr:nth-child(3) input');
+            const inNotes = changeInTable.querySelectorAll('tbody tr:nth-child(4) .notes-field');
+            for(let i=0; i<inCounts.length; i++) {
+                data.push(inCounts[i].value);
+                data.push(inSubtotals[i].value);
+                data.push(inChecks[i].checked);
+                data.push(inNotes[i].value);
+            }
+            data.push(document.getElementById('change-in-over').value);
+            data.push(document.getElementById('change-in-short').value);
+            const intraday = [];
+            const intradayRows = document.querySelectorAll('#intraday-table tbody tr');
+            for (let i = 0; i < intradayRows.length - 1; i++) {
+                const time = intradayRows[i].querySelector('.intraday-time').value;
+                const amount = intradayRows[i].querySelector('.intraday-item').value;
+                const notes = intradayRows[i].querySelector('.intraday-notes').value;
+                if(amount !== '0' && amount !== '') {
+                     intraday.push({ time: time, amount: amount, notes: notes });
+                }
+            }
+            data.push(JSON.stringify(intraday));
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            })
+            .then(response => {
+                statusMsg.textContent = "บันทึกข้อมูลสำเร็จ!";
+                statusMsg.className = 'status-message success';
+                submitBtn.disabled = false;
+                resetForm(); // <-- เรียกใช้ฟังก์ชันล้างฟอร์มตรงนี้
+            })
+            .catch(error => {
+                statusMsg.textContent = "เกิดข้อผิดพลาด: " + error.message;
+                statusMsg.className = 'status-message error';
+                submitBtn.disabled = false;
+            });
+        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const dateField = document.getElementById('current-date');
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            dateField.value = `${dd}/${mm}/${yyyy}`;
+
+            // --- START: New code to handle form enabling/disabling ---
+            const cashierNameInput = document.getElementById('cashier-name');
+            const formContent = document.getElementById('main-form-content');
+
+            function toggleFormState() {
+                const hasName = cashierNameInput.value.trim() !== '';
+                formContent.classList.toggle('form-disabled', !hasName);
+            }
+
+            cashierNameInput.addEventListener('input', toggleFormState);
+            toggleFormState(); // Set initial state on page load
+            // --- END: New code ---
+
+            ['change-out', 'expenses', 'change-in', 'intraday'].forEach(calculateTotal);
+        });
+        function formatNumberWithCommas(number) {
+            if (isNaN(parseFloat(number))) return "0.00";
+            return parseFloat(number).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function updateSignatures() {
+            const cashierName = document.getElementById('cashier-name').value;
+            document.querySelectorAll('.sender-signature').forEach(field => field.value = cashierName);
+        }
+        function calculateTotal(section) {
+            let total = 0;
+            if (section === 'change-out' || section === 'change-in') {
+                const table = document.getElementById(`${section}-table`);
+                const numberInputs = table.querySelectorAll('tbody tr:nth-child(1) input[type="number"]');
+                const checkboxes = table.querySelectorAll('tbody tr:nth-child(2) input[type="checkbox"]');
+                const subtotalFields = table.querySelectorAll('tbody tr:nth-child(3) input.subtotal-field');
+                const notesCells = table.querySelectorAll('tbody tr:nth-child(4) .notes-cell');
+                const notesFields = table.querySelectorAll('tbody tr:nth-child(4) .notes-field');
+
+                for (let i = 0; i < numberInputs.length; i++) {
+                    const count = parseFloat(numberInputs[i].value) || 0;
+                    const denomination = parseFloat(numberInputs[i].dataset.value);
+                    const isChecked = checkboxes[i].checked;
+                    const subtotal = count * denomination;
+                    total += subtotal;
+                    subtotalFields[i].value = formatNumberWithCommas(subtotal);
+
+                    if (isChecked) {
+                        subtotalFields[i].classList.add('verified');
+                        notesCells[i].classList.remove('visible');
+                        notesFields[i].value = '';
+                    } else {
+                        subtotalFields[i].classList.remove('verified');
+                        notesCells[i].classList.add('visible');
+                    }
+                }
+                if (section === 'change-in') {
+                    const overAmount = parseFloat(document.getElementById('change-in-over').value) || 0;
+                    const shortAmount = parseFloat(document.getElementById('change-in-short').value) || 0;
+                    const finalTotal = total + overAmount - shortAmount;
+                    document.getElementById(`${section}-total`).value = formatNumberWithCommas(finalTotal);
+                } else {
+                    document.getElementById(`${section}-total`).value = formatNumberWithCommas(total);
+                }
+            } else if (section === 'expenses') {
+                document.querySelectorAll('#expenses-table .expense-item').forEach(input => total += parseFloat(input.value) || 0);
+                document.getElementById('expenses-total').value = formatNumberWithCommas(total);
+            } else if (section === 'intraday') {
+                document.querySelectorAll('.intraday-item').forEach(input => total += parseFloat(input.value) || 0);
+                document.getElementById('intraday-total').value = formatNumberWithCommas(total);
+            }
+            updateFinalSummary();
+        }
+        function updateFinalSummary() {
+            const changeOutTotal = parseFloat(document.getElementById('change-out-total').value.replace(/,/g, '')) || 0;
+            const expensesTotal = parseFloat(document.getElementById('expenses-total').value.replace(/,/g, '')) || 0;
+            const intradayTotal = parseFloat(document.getElementById('intraday-total').value.replace(/,/g, '')) || 0;
+            const cashSales = parseFloat(document.getElementById('summary-cash-sales').value) || 0;
+            const transferSales = parseFloat(document.getElementById('summary-transfer-sales').value) || 0;
+            const creditSales = parseFloat(document.getElementById('summary-credit-sales').value) || 0;
+            const totalRevenue = changeOutTotal + cashSales;
+            const balance = totalRevenue - expensesTotal - intradayTotal;
+            const totalSales = cashSales + transferSales + creditSales;
+            document.getElementById('summary-capital').value = formatNumberWithCommas(changeOutTotal);
+            document.getElementById('summary-total-revenue').value = formatNumberWithCommas(totalRevenue);
+            document.getElementById('summary-expenses').value = formatNumberWithCommas(expensesTotal);
+            document.getElementById('summary-intraday').value = formatNumberWithCommas(intradayTotal);
+            document.getElementById('summary-balance').value = formatNumberWithCommas(balance);
+            document.getElementById('summary-cash-sales-display').value = formatNumberWithCommas(cashSales);
+            document.getElementById('summary-total-sales').value = formatNumberWithCommas(totalSales);
+        }
+    </script>
+</body>
+</html>
