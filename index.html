@@ -732,14 +732,18 @@
                 }
             }
             data.push(JSON.stringify(intraday));
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                redirect: 'follow'
-            })
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                      cache: 'no-cache',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                        action: "saveData",
+                      data: data
+    }),
+    redirect: 'follow'
+})
+
             .then(response => {
                 statusMsg.textContent = "บันทึกข้อมูลสำเร็จ!";
                 statusMsg.className = 'status-message success';
