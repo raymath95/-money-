@@ -29,7 +29,7 @@
         }
 
         body {
-            font-family: 'Sarabun', 'Tahoma', sans-serif';
+            font-family: 'Sarabun', 'Tahoma', sans-serif;
             font-size: 14px;
             margin: 20px;
             background-color: var(--body-bg);
@@ -237,6 +237,26 @@
             cursor: not-allowed;
             transform: none;
         }
+        .intraday-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .intraday-status {
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+        .intraday-status.error {
+            color: var(--danger-red);
+        }
+        .recipient-signature {
+            border: none;
+            background-color: transparent;
+            font-weight: bold;
+            color: #004085;
+            width: 90%;
+        }
         #status-message {
             font-weight: bold;
             font-size: 15px;
@@ -294,6 +314,15 @@
         .notes-cell.visible {
             visibility: visible;
         }
+        .expense-table-col {
+            width: 16%;
+        }
+        .expense-table-btn-col {
+            width: 4%;
+        }
+        .summary-row-hidden {
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
@@ -328,7 +357,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
+            <tr aria-label="จำนวนธนบัตร/เหรียญ ขาเข้า">
                 <td><input type="number" min="0" value="0" data-value="1000" oninput="calculateTotal('change-out')"></td>
                 <td><input type="number" min="0" value="0" data-value="500" oninput="calculateTotal('change-out')"></td>
                 <td><input type="number" min="0" value="0" data-value="100" oninput="calculateTotal('change-out')"></td>
@@ -338,15 +367,15 @@
                 <td><input type="number" min="0" value="0" data-value="5" oninput="calculateTotal('change-out')"></td>
                 <td><input type="number" min="0" value="0" data-value="1" oninput="calculateTotal('change-out')"></td>
             </tr>
-            <tr>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-out')"></td>
+            <tr aria-label="ตรวจสอบยอด ขาเข้า">
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 1000 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 500 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 100 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 50 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 20 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 10 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 5 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-out')" aria-label="ตรวจสอบยอด 1 บาท"></td>
             </tr>
             <tr class="subtotal-row">
                 <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
@@ -382,19 +411,19 @@
     <table id="expenses-table">
         <thead>
             <tr>
-                <th style="width: 16%;">รายการ</th>
-                <th style="width: 16%;">จำนวนเงิน</th>
-                <th style="width: 16%;">รายการ</th>
-                <th style="width: 16%;">จำนวนเงิน</th>
-                <th style="width: 16%;">รายการเบิกเงิน</th>
-                <th style="width: 16%;">จำนวนเงิน</th>
-                <th style="width: 4%;"></th>
+                <th class="expense-table-col">รายการ</th>
+                <th class="expense-table-col">จำนวนเงิน</th>
+                <th class="expense-table-col">รายการ</th>
+                <th class="expense-table-col">จำนวนเงิน</th>
+                <th class="expense-table-col">รายการเบิกเงิน</th>
+                <th class="expense-table-col">จำนวนเงิน</th>
+                <th class="expense-table-btn-col"></th>
             </tr>
         </thead>
         <tbody id="expense-body">
              <tr>
                 <td><input type="text" class="text-left expense-desc"></td>
-                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')" aria-label="จำนวนเงิน"></td>
                 <td><input type="text" class="text-left expense-desc"></td>
                 <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
                 <td><input type="text" class="text-left expense-desc"></td>
@@ -418,25 +447,25 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td><input type="number" min="0" value="0" data-value="1000" oninput="calculateTotal('change-in')"></td>
-                <td><input type="number" min="0" value="0" data-value="500" oninput="calculateTotal('change-in')"></td>
-                <td><input type="number" min="0" value="0" data-value="100" oninput="calculateTotal('change-in')"></td>
+            <tr aria-label="จำนวนธนบัตร/เหรียญ ขาออก">
+                <td><input type="number" min="0" value="0" data-value="1000" oninput="calculateTotal('change-in')" aria-label="จำนวนธนบัตร 1000 บาท"></td>
+                <td><input type="number" min="0" value="0" data-value="500" oninput="calculateTotal('change-in')" aria-label="จำนวนธนบัตร 500 บาท"></td>
+                <td><input type="number" min="0" value="0" data-value="100" oninput="calculateTotal('change-in')" aria-label="จำนวนธนบัตร 100 บาท"></td>
                 <td><input type="number" min="0" value="0" data-value="50" oninput="calculateTotal('change-in')"></td>
                 <td><input type="number" min="0" value="0" data-value="20" oninput="calculateTotal('change-in')"></td>
                 <td><input type="number" min="0" value="0" data-value="10" oninput="calculateTotal('change-in')"></td>
                 <td><input type="number" min="0" value="0" data-value="5" oninput="calculateTotal('change-in')"></td>
                 <td><input type="number" min="0" value="0" data-value="1" oninput="calculateTotal('change-in')"></td>
             </tr>
-            <tr>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
-                <td><input type="checkbox" onchange="calculateTotal('change-in')"></td>
+            <tr aria-label="ตรวจสอบยอด ขาออก">
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 1000 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 500 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 100 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 50 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 20 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 10 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 5 บาท"></td>
+                <td><input type="checkbox" onchange="calculateTotal('change-in')" aria-label="ตรวจสอบยอด 1 บาท"></td>
             </tr>
             <tr class="subtotal-row">
                 <td><input type="text" value="0.00" class="subtotal-field" readonly></td>
@@ -460,11 +489,11 @@
             </tr>
             <tr>
                 <td colspan="6" class="text-left-header">เงินเกิน</td>
-                <td colspan="2"><input type="number" id="change-in-over" class="total-field" min="0" value="0" oninput="calculateTotal('change-in')"></td>
+                <td colspan="2"><input type="number" id="change-in-over" class="total-field" min="0" value="0" oninput="calculateTotal('change-in')" aria-label="จำนวนเงินเกิน"></td>
             </tr>
             <tr>
                 <td colspan="6" class="text-left-header">เงินขาด</td>
-                <td colspan="2"><input type="number" id="change-in-short" class="total-field" min="0" value="0" oninput="calculateTotal('change-in')"></td>
+                <td colspan="2"><input type="number" id="change-in-short" class="total-field" min="0" value="0" oninput="calculateTotal('change-in')" aria-label="จำนวนเงินขาด"></td>
             </tr>
             <tr class="total-row">
                 <td colspan="6" class="text-left-header">ส่งยอด</td>
@@ -482,25 +511,25 @@
         </thead>
         <tbody>
             <tr>
-                <td style="width:15%;"><input type="time" class="intraday-time"></td>
-                <td style="width:20%;"><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)"></td>
-                <td style="width:20%;"><input type="text" class="sender-signature text-center" readonly></td>
-                <td style="width:20%;"></td>
-                <td style="width:25%;"><input type="text" class="text-left intraday-notes"></td>
+                <td><input type="time" class="intraday-time" aria-label="เวลาส่งเงินระหว่างวัน"></td>
+                <td><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)" aria-label="จำนวนเงินที่ส่งระหว่างวัน"></td>
+                <td><input type="text" class="sender-signature text-center" readonly></td>
+                <td><input type="text" class="recipient-signature text-center" readonly aria-label="ลายเซ็นผู้รับเงิน"></td>
+                <td><input type="text" class="text-left intraday-notes" aria-label="หมายเหตุส่งเงินระหว่างวัน"></td>
             </tr>
             <tr>
-                <td style="width:15%;"><input type="time" class="intraday-time"></td>
-                <td style="width:20%;"><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)"></td>
-                <td style="width:20%;"><input type="text" class="sender-signature text-center" readonly></td>
-                <td style="width:20%;"></td>
-                <td style="width:25%;"><input type="text" class="text-left intraday-notes"></td>
+                <td><input type="time" class="intraday-time" aria-label="เวลาส่งเงินระหว่างวัน 2"></td>
+                <td><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)" aria-label="จำนวนเงินที่ส่งระหว่างวัน 2"></td>
+                <td><input type="text" class="sender-signature text-center" readonly></td>
+                <td><input type="text" class="recipient-signature text-center" readonly aria-label="ลายเซ็นผู้รับเงิน 2"></td>
+                <td><input type="text" class="text-left intraday-notes" aria-label="หมายเหตุส่งเงินระหว่างวัน 2"></td>
             </tr>
             <tr>
-                <td style="width:15%;"><input type="time" class="intraday-time"></td>
-                <td style="width:20%;"><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)"></td>
-                <td style="width:20%;"><input type="text" class="sender-signature text-center" readonly></td>
-                <td style="width:20%;"></td>
-                <td style="width:25%;"><input type="text" class="text-left intraday-notes"></td>
+                <td><input type="time" class="intraday-time" aria-label="เวลาส่งเงินระหว่างวัน"></td>
+                <td><input type="number" class="intraday-item" min="0" value="0" oninput="handleIntradayInput(this)" aria-label="จำนวนเงินที่ส่งระหว่างวัน"></td>
+                <td><input type="text" class="sender-signature text-center" readonly></td>
+                <td><input type="text" class="recipient-signature text-center" readonly aria-label="ลายเซ็นผู้รับเงิน"></td>
+                <td><input type="text" class="text-left intraday-notes" aria-label="หมายเหตุส่งเงินระหว่างวัน"></td>
             </tr>
             <tr class="total-row">
                 <td class="text-left-header">รวมส่งเงิน</td>
@@ -509,6 +538,10 @@
             </tr>
         </tbody>
     </table>
+    <div class="intraday-actions">
+        <button type="button" id="intraday-notify-btn" class="add-row-btn" onclick="requestIntradaySignature()">แจ้งผู้รับเงินผ่าน Telegram</button>
+        <span id="intraday-recipient-status" class="intraday-status"></span>
+    </div>
     
     <div class="summary-section">
         <div class="summary-column">
@@ -519,22 +552,22 @@
             </div>
             <div class="summary-row">
                 <label>ขาย เงินสด</label>
-                <input type="number" id="summary-cash-sales" value="0" oninput="updateFinalSummary()">
+                <input type="number" id="summary-cash-sales" value="0" oninput="updateFinalSummary()" aria-label="ยอดขายเงินสด">
                 <span>บาท</span>
             </div>
             <div class="summary-row">
                 <label>รวม</label>
-                <input type="text" id="summary-total-revenue" class="orange-bg" readonly>
+                <input type="text" id="summary-total-revenue" class="orange-bg" readonly aria-label="ยอดรวมฝั่งซ้าย">
                 <span>บาท</span>
             </div>
              <div class="summary-row">
                 <label>หัก ค่าใช้จ่าย</label>
-                <input type="text" id="summary-expenses" class="orange-bg" readonly>
+                <input type="text" id="summary-expenses" class="orange-bg" readonly aria-label="ยอดหักค่าใช้จ่าย">
                 <span>บาท</span>
             </div>
             <div class="summary-row">
                 <label>หัก ส่งเงิน</label>
-                <input type="text" id="summary-intraday" class="orange-bg" readonly>
+                <input type="text" id="summary-intraday" class="orange-bg" readonly aria-label="ยอดหักส่งเงิน">
                 <span>บาท</span>
             </div>
             <div class="summary-row">
@@ -546,24 +579,24 @@
         <div class="summary-column">
              <div class="summary-row">
                 <label>ขาย เงินสด</label>
-                <input type="text" id="summary-cash-sales-display" readonly>
+                <input type="text" id="summary-cash-sales-display" readonly aria-label="ยอดขายเงินสด (แสดงผล)">
                 <span>บาท</span>
             </div>
             <div class="summary-row">
                 <label>ขาย เงินโอน</label>
-                <input type="number" id="summary-transfer-sales" value="0" oninput="updateFinalSummary()">
+                <input type="number" id="summary-transfer-sales" value="0" oninput="updateFinalSummary()" aria-label="ยอดขายเงินโอน">
                 <span>บาท</span>
             </div>
             <div class="summary-row">
                 <label>ขาย เงินเชื่อ</label>
-                <input type="number" id="summary-credit-sales" value="0" oninput="updateFinalSummary()">
+                <input type="number" id="summary-credit-sales" value="0" oninput="updateFinalSummary()" aria-label="ยอดขายเงินเชื่อ">
                 <span>บาท</span>
             </div>
-             <div class="summary-row" style="visibility: hidden;"><label>&nbsp;</label><input><label>&nbsp;</label></div>
-             <div class="summary-row" style="visibility: hidden;"><label>&nbsp;</label><input><label>&nbsp;</label></div>
+             <div class="summary-row summary-row-hidden"><label>&nbsp;</label><input aria-label="hidden spacer"><label>&nbsp;</label></div>
+             <div class="summary-row summary-row-hidden"><label>&nbsp;</label><input aria-label="hidden spacer"><label>&nbsp;</label></div>
             <div class="summary-row">
                 <label>รวม</label>
-                <input type="text" id="summary-total-sales" class="green-bg" readonly>
+                <input type="text" id="summary-total-sales" class="green-bg" readonly aria-label="ยอดรวมการขาย">
                 <span>บาท</span>
             </div>
         </div>
@@ -578,6 +611,10 @@
 </div>
 
     <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyKR1YjZHRqzBk-mCW18poVi9oRVjNu3C9C_bFRm6x3jN4NZICf5ly6RNYIvXJraYUO/exec";
+        const INTRADAY_POLL_INTERVAL = 4000;
+        let intradaySignaturePollingId = null;
+        let latestIntradayRequestId = null;
         function handleIntradayInput(inputElement) {
             const row = inputElement.closest('tr');
             const timeInput = row.querySelector('.intraday-time');
@@ -598,7 +635,8 @@
         // ***** ฟังก์ชันใหม่สำหรับล้างฟอร์ม *****
         function resetForm() {
             // ล้างชื่อแคชเชียร์
-            document.getElementById('cashier-name').value = '';
+            const cashierNameInput = document.getElementById('cashier-name');
+            cashierNameInput.value = '';
 
             // ล้างตารางเงินทอน (ขาออก และ ขาเข้า)
             ['change-out-table', 'change-in-table'].forEach(tableId => {
@@ -620,6 +658,11 @@
                  if(input.type === 'number') input.value = '0';
                  else if (input.type !== 'text' || !input.classList.contains('sender-signature')) input.value = '';
             });
+            clearRecipientSignatureFields();
+            setIntradayStatus('');
+            clearIntradayPolling();
+            latestIntradayRequestId = null;
+            document.getElementById('intraday-notify-btn').disabled = false;
 
             // ล้างยอดขาย
             document.getElementById('summary-cash-sales').value = '0';
@@ -633,7 +676,8 @@
 
             // เลื่อนหน้าจอไปด้านบนสุด
             window.scrollTo(0, 0);
-            document.getElementById('cashier-name').focus();
+            cashierNameInput.focus();
+            cashierNameInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
 
@@ -644,19 +688,19 @@
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <td><input type="text" class="text-left expense-desc"></td>
-                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')" aria-label="จำนวนเงินค่าใช้จ่าย"></td>
                 <td><input type="text" class="text-left expense-desc"></td>
-                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')" aria-label="จำนวนเงินค่าใช้จ่าย"></td>
                 <td><input type="text" class="text-left expense-desc"></td>
-                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')"></td>
-                <td><button type="button" class="delete-row-btn" onclick="deleteRow(this, 'expenses')">&times;</button></td>
+                <td><input type="number" class="expense-item" min="0" value="0" oninput="calculateTotal('expenses')" aria-label="จำนวนเงินค่าใช้จ่าย"></td>
+                <td><button type="button" class="delete-row-btn" onclick="deleteRow(this, 'expenses')" aria-label="ลบแถวค่าใช้จ่าย">&times;</button></td>
             `;
             tbody.appendChild(newRow);
         }
 
         function deleteRow(button, section) {
             const tbody = button.closest('tbody');
-            if (tbody.rows.length > 1) {
+            if (tbody.rows.length > 0) {
                 button.closest('tr').remove();
                 calculateTotal(section);
             } else {
@@ -665,7 +709,6 @@
         }
 
         function handleFormSubmit() {
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr0DnrTFR0OsRZkg61TB1SVO1J-_KxE4cusYYbVnWMiNwgrUgP1rvU2Sp2h-PVUcXi/exec"; 
             const submitBtn = document.getElementById('submit-btn');
             const statusMsg = document.getElementById('status-message');
             submitBtn.disabled = true;
@@ -732,7 +775,7 @@
                 }
             }
             data.push(JSON.stringify(intraday));
-            fetch(SCRIPT_URL, {
+            fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 cache: 'no-cache',
@@ -844,6 +887,103 @@
             document.getElementById('summary-balance').value = formatNumberWithCommas(balance);
             document.getElementById('summary-cash-sales-display').value = formatNumberWithCommas(cashSales);
             document.getElementById('summary-total-sales').value = formatNumberWithCommas(totalSales);
+        }
+        function clearRecipientSignatureFields() {
+            document.querySelectorAll('.recipient-signature').forEach(input => input.value = '');
+        }
+        function setIntradayStatus(message, isError = false) {
+            const statusEl = document.getElementById('intraday-recipient-status');
+            statusEl.textContent = message;
+            if (!message) {
+                statusEl.classList.remove('error');
+                return;
+            }
+            statusEl.classList.toggle('error', isError);
+        }
+        function clearIntradayPolling() {
+            if (intradaySignaturePollingId) {
+                clearInterval(intradaySignaturePollingId);
+                intradaySignaturePollingId = null;
+            }
+        }
+        function pollIntradaySignature(requestId) {
+            if (!requestId) return;
+            clearIntradayPolling();
+            latestIntradayRequestId = requestId;
+            setIntradayStatus('รอผู้รับเงินตอบกลับ...', false);
+            intradaySignaturePollingId = setInterval(async () => {
+                try {
+                    const response = await fetch(`${WEB_APP_URL}?action=getIntradaySignature&requestId=${encodeURIComponent(requestId)}`, {
+                        method: 'GET',
+                        mode: 'cors',
+                        cache: 'no-cache'
+                    });
+                    if (!response.ok) throw new Error('ไม่สามารถดึงสถานะได้');
+                    const data = await response.json();
+                    if (data.status === 'signed' && data.signature) {
+                        document.querySelectorAll('.recipient-signature').forEach(input => input.value = data.signature);
+                        setIntradayStatus('ได้รับลายเซ็นจาก ' + (data.signatureFrom || 'ผู้รับเงิน'), false);
+                        clearIntradayPolling();
+                        latestIntradayRequestId = null;
+                        document.getElementById('intraday-notify-btn').disabled = false;
+                    }
+                } catch (error) {
+                    setIntradayStatus('ไม่สามารถเช็กลายเซ็น: ' + error.message, true);
+                    clearIntradayPolling();
+                    latestIntradayRequestId = null;
+                    document.getElementById('intraday-notify-btn').disabled = false;
+                }
+            }, INTRADAY_POLL_INTERVAL);
+        }
+        async function requestIntradaySignature() {
+            const notifyBtn = document.getElementById('intraday-notify-btn');
+            if (notifyBtn.disabled) return;
+            const rows = [];
+            document.querySelectorAll('#intraday-table tbody tr').forEach(row => {
+                const timeInput = row.querySelector('.intraday-time');
+                const amountInput = row.querySelector('.intraday-item');
+                const notesInput = row.querySelector('.intraday-notes');
+                if (!amountInput) return;
+                const amountValue = amountInput.value || '0';
+                if (parseFloat(amountValue) === 0) return;
+                rows.push({
+                    time: timeInput ? timeInput.value : '',
+                    amount: amountValue,
+                    notes: notesInput ? notesInput.value : ''
+                });
+            });
+            if (rows.length === 0) {
+                setIntradayStatus('กรุณากรอกจำนวนเงินระหว่างวันก่อนส่ง', true);
+                return;
+            }
+            notifyBtn.disabled = true;
+            setIntradayStatus('ส่งข้อมูลไปยัง Telegram แล้ว...', false);
+            clearRecipientSignatureFields();
+            clearIntradayPolling();
+            latestIntradayRequestId = null;
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'sendIntradayRequest',
+                        intradayRows: rows,
+                        cashierName: document.getElementById('cashier-name').value
+                    })
+                });
+                if (!response.ok) throw new Error('ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
+                const payload = await response.json();
+                if (payload.status === 'success' && payload.requestId) {
+                    pollIntradaySignature(payload.requestId);
+                    return;
+                }
+                throw new Error(payload.message || 'ไม่สามารถส่งคำขอได้');
+            } catch (error) {
+                setIntradayStatus('เกิดข้อผิดพลาด: ' + error.message, true);
+                notifyBtn.disabled = false;
+            }
         }
     </script>
 </body>
