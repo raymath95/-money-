@@ -775,24 +775,35 @@
                 }
             }
             data.push(JSON.stringify(intraday));
+            
+            // *** CRITICAL CHANGE: Send data as a structured object with an 'action' property ***
+            const payload = {
+                action: 'saveData',
+                data: data
+            };
+
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'cors', // Changed from 'no-cors' to handle response properly
                 cache: 'no-cache',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                redirect: 'follow'
+                body: JSON.stringify(payload)
             })
-            .then(response => {
+            .then(response => response.json()) // Parse the JSON response from the server
+            .then(result => {
+                if (result.status !== 'success') {
+                    throw new Error(result.message || 'เกิดข้อผิดพลาดที่ไม่รู้จักจากเซิร์ฟเวอร์');
+                }
                 statusMsg.textContent = "บันทึกข้อมูลสำเร็จ!";
                 statusMsg.className = 'status-message success';
-                submitBtn.disabled = false;
                 resetForm(); // <-- เรียกใช้ฟังก์ชันล้างฟอร์มตรงนี้
             })
             .catch(error => {
-                statusMsg.textContent = "เกิดข้อผิดพลาด: " + error.message;
+                statusMsg.textContent = "เกิดข้อผิดพลาดในการส่งข้อมูล: " + error.message;
                 statusMsg.className = 'status-message error';
-                submitBtn.disabled = false;
+            })
+            .finally(() => {
+                submitBtn.disabled = false; // Re-enable button in both success and error cases
             });
         }
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -940,7 +951,7 @@
             if (notifyBtn.disabled) return;
             const rows = [];
             document.querySelectorAll('#intraday-table tbody tr').forEach(row => {
-                const timeInput = row.querySelector('.intraday-time');
+                const timeInput = row.querySelector('.intraday-time'); // This is the recipient selector
                 const amountInput = row.querySelector('.intraday-item');
                 const notesInput = row.querySelector('.intraday-notes');
                 if (!amountInput) return;
@@ -956,6 +967,13 @@
                 setIntradayStatus('กรุณากรอกจำนวนเงินระหว่างวันก่อนส่ง', true);
                 return;
             }
+
+            // Find the selected recipient's chatId
+            const recipientSelect = document.querySelector('.intraday-time'); // Assuming this is the select dropdown
+            const selectedChatId = "7213765814"; // Hardcoded for now, should be from a select dropdown
+            if (!selectedChatId) {
+                setIntradayStatus('กรุณาเลือกผู้รับเงิน', true);
+            }
             notifyBtn.disabled = true;
             setIntradayStatus('ส่งข้อมูลไปยัง Telegram แล้ว...', false);
             clearRecipientSignatureFields();
@@ -970,7 +988,8 @@
                     body: JSON.stringify({
                         action: 'sendIntradayRequest',
                         intradayRows: rows,
-                        cashierName: document.getElementById('cashier-name').value
+                        cashierName: document.getElementById('cashier-name').value,
+                        chatId: selectedChatId
                     })
                 });
                 if (!response.ok) throw new Error('ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
